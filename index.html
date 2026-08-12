@@ -3,51 +3,337 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b2d5c">
-  <meta http-equiv="refresh" content="1.2;url=https://script.google.com/macros/s/AKfycbz-wXB7DVLMAG0bb2V-argyd1m-RpumvF5cOHyqaFYOcUwSipoVLrOrejOdTaRfFtie/exec?view=request">
+  <meta name="theme-color" content="#eef4fb">
+  <meta http-equiv="refresh" content="1.6;url=https://script.google.com/macros/s/AKfycbz-wXB7DVLMAG0bb2V-argyd1m-RpumvF5cOHyqaFYOcUwSipoVLrOrejOdTaRfFtie/exec?view=request">
   <title>Control de Autorizaciones de Parqueo Sótano</title>
   <style>
-    :root{--blue:#0b2d5c;--orange:#f36c21;--bg:#f4f7fb;--ink:#172b4d;--muted:#5d6b7a;--line:#d9e2ec}
+    :root{
+      --blue:#0b2d5c;
+      --orange:#f36c21;
+      --bg1:#eef4fb;
+      --bg2:#f9fbfd;
+      --ink:#172b4d;
+      --muted:#617086;
+      --line:#d9e2ec;
+    }
+
     *{box-sizing:border-box}
-    html,body{min-height:100%}
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);display:flex;align-items:center;justify-content:center;padding:24px}
-    .card{width:min(100%,520px);background:#fff;border:1px solid var(--line);border-radius:24px;padding:34px 28px;text-align:center;box-shadow:0 14px 36px rgba(11,45,92,.08)}
-    .mark{width:72px;height:72px;margin:0 auto 22px;border-radius:18px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:28px;font-weight:800;letter-spacing:-1px}
-    h1{margin:0;color:var(--blue);font-size:clamp(26px,7vw,36px);line-height:1.08}
-    .sub{margin:12px 0 0;font-size:18px;font-weight:700}
-    .dept{margin:6px 0 28px;color:var(--muted);font-size:15px}
-    .loading{display:flex;justify-content:center;align-items:center;gap:10px;margin:22px 0 18px;color:var(--blue);font-weight:700}
-    .spinner{width:20px;height:20px;border:3px solid #dbe4ef;border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    a.button{display:inline-block;margin-top:8px;padding:14px 22px;border-radius:12px;background:var(--orange);color:#fff;text-decoration:none;font-weight:800}
-    footer{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;line-height:1.5}
+    html,body{margin:0;min-height:100%}
+
+    body{
+      font-family:Arial,Helvetica,sans-serif;
+      color:var(--ink);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:
+        radial-gradient(circle at 12% 15%, rgba(11,45,92,.05) 0 2px, transparent 2.5px) 0 0/18px 18px,
+        linear-gradient(135deg, rgba(11,45,92,.025) 25%, transparent 25%) 0 0/180px 180px,
+        linear-gradient(315deg, rgba(11,45,92,.018) 25%, transparent 25%) 0 0/220px 220px,
+        linear-gradient(145deg,var(--bg1),var(--bg2));
+      overflow:hidden;
+      position:relative;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:absolute;
+      width:420px;
+      height:420px;
+      border:1px solid rgba(11,45,92,.06);
+      transform:rotate(45deg);
+      pointer-events:none;
+    }
+
+    body::before{left:-260px;top:18%}
+    body::after{right:-280px;bottom:6%}
+
+    .card{
+      width:min(100%,600px);
+      background:rgba(255,255,255,.94);
+      border:1px solid rgba(11,45,92,.10);
+      border-radius:28px;
+      padding:42px 34px 30px;
+      text-align:center;
+      box-shadow:0 18px 42px rgba(11,45,92,.10);
+      backdrop-filter:blur(6px);
+      position:relative;
+      z-index:1;
+    }
+
+    .gate{
+      width:120px;
+      height:78px;
+      margin:0 auto 24px;
+      position:relative;
+    }
+
+    .car-top{
+      position:absolute;
+      left:10px;
+      bottom:9px;
+      width:64px;
+      height:28px;
+      border:4px solid var(--blue);
+      border-radius:9px 9px 6px 6px;
+    }
+
+    .car-top::before{
+      content:"";
+      position:absolute;
+      width:42px;
+      height:18px;
+      left:7px;
+      top:-16px;
+      border:4px solid var(--blue);
+      border-bottom:0;
+      border-radius:10px 10px 0 0;
+    }
+
+    .car-top::after{
+      content:"";
+      position:absolute;
+      left:9px;
+      bottom:-9px;
+      width:40px;
+      height:6px;
+      border-left:7px solid var(--blue);
+      border-right:7px solid var(--blue);
+    }
+
+    .barrier{
+      position:absolute;
+      right:13px;
+      bottom:0;
+      width:9px;
+      height:58px;
+      background:var(--blue);
+      border-radius:5px 5px 0 0;
+    }
+
+    .barrier::before{
+      content:"";
+      position:absolute;
+      width:72px;
+      height:8px;
+      right:1px;
+      top:0;
+      background:repeating-linear-gradient(
+        90deg,
+        var(--orange) 0 14px,
+        #fff 14px 23px
+      );
+      border:2px solid var(--orange);
+      transform-origin:right center;
+      transform:rotate(35deg);
+      border-radius:3px;
+    }
+
+    h1{
+      margin:0;
+      color:var(--blue);
+      font-size:clamp(30px,6vw,44px);
+      line-height:1.05;
+      letter-spacing:-.02em;
+    }
+
+    .subtitle{
+      margin-top:14px;
+      color:var(--blue);
+      font-size:20px;
+      font-weight:800;
+    }
+
+    .dept{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:16px;
+    }
+
+    .loader-wrap{
+      margin:34px auto 10px;
+      width:min(100%,430px);
+    }
+
+    .track{
+      height:3px;
+      background:#cfd8e3;
+      position:relative;
+      overflow:visible;
+      border-radius:999px;
+    }
+
+    .track::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      height:100%;
+      width:45%;
+      background:var(--orange);
+      border-radius:999px;
+      animation:progress 1.15s ease-in-out infinite alternate;
+    }
+
+    .mini-car{
+      position:absolute;
+      top:-19px;
+      left:34%;
+      width:56px;
+      height:24px;
+      border:3px solid var(--blue);
+      border-radius:8px 10px 6px 6px;
+      background:#fff;
+      animation:drive 1.15s ease-in-out infinite alternate;
+    }
+
+    .mini-car::before{
+      content:"";
+      position:absolute;
+      left:11px;
+      top:-12px;
+      width:28px;
+      height:13px;
+      border:3px solid var(--blue);
+      border-bottom:0;
+      border-radius:8px 8px 0 0;
+      background:#fff;
+    }
+
+    .mini-car::after{
+      content:"";
+      position:absolute;
+      left:7px;
+      bottom:-7px;
+      width:36px;
+      height:5px;
+      border-left:6px solid var(--blue);
+      border-right:6px solid var(--blue);
+    }
+
+    .speed-lines{
+      position:absolute;
+      top:-9px;
+      left:-33px;
+      width:26px;
+      height:3px;
+      background:var(--orange);
+      box-shadow:8px 8px 0 rgba(243,108,33,.55), 15px -7px 0 rgba(243,108,33,.35);
+      border-radius:999px;
+    }
+
+    .status{
+      margin-top:30px;
+      color:var(--blue);
+      font-size:20px;
+      font-weight:800;
+    }
+
+    .status-small{
+      margin-top:5px;
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .manual{
+      display:none;
+      margin-top:18px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .manual a{
+      display:inline-block;
+      margin-top:10px;
+      padding:12px 18px;
+      border-radius:12px;
+      background:var(--orange);
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+    }
+
+    footer{
+      margin-top:34px;
+      padding-top:22px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    .version{margin-top:8px;color:#7a8798}
+    .dot{color:var(--orange);padding:0 6px}
+
+    @keyframes drive{
+      from{left:28%}
+      to{left:58%}
+    }
+
+    @keyframes progress{
+      from{width:38%}
+      to{width:68%}
+    }
+
+    @media (max-width:520px){
+      body{padding:14px}
+      .card{padding:32px 20px 24px;border-radius:22px}
+      .gate{transform:scale(.9);margin-bottom:16px}
+      h1{font-size:32px}
+      .subtitle{font-size:18px}
+      .dept{font-size:15px}
+      .status{font-size:18px}
+      footer{font-size:13px}
+    }
   </style>
 </head>
 <body>
   <main class="card">
-    <div class="mark">RT</div>
-    <h1>Control de Autorizaciones de Parqueo Sótano</h1>
-    <div class="sub">Portal de Solicitudes</div>
-    <div class="dept">Facilities Management &amp; Security</div>
-
-    <div class="loading">
-      <span class="spinner" aria-hidden="true"></span>
-      <span>Abriendo portal...</span>
+    <div class="gate" aria-hidden="true">
+      <div class="car-top"></div>
+      <div class="barrier"></div>
     </div>
 
-    <a class="button" href="https://script.google.com/macros/s/AKfycbz-wXB7DVLMAG0bb2V-argyd1m-RpumvF5cOHyqaFYOcUwSipoVLrOrejOdTaRfFtie/exec?view=request">INGRESAR AL PORTAL</a>
+    <h1>Control de Autorizaciones<br>de Parqueo Sótano</h1>
+    <div class="subtitle">Portal de Solicitudes</div>
+    <div class="dept">Facilities Management &amp; Security</div>
+
+    <div class="loader-wrap" aria-label="Cargando portal">
+      <div class="track">
+        <div class="mini-car">
+          <div class="speed-lines"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status">Verificando acceso...</div>
+    <div class="status-small">Por favor espera un momento</div>
+
+    <div class="manual" id="manualOpen">
+      Si no eres redirigido automáticamente:
+      <br>
+      <a href="https://script.google.com/macros/s/AKfycbz-wXB7DVLMAG0bb2V-argyd1m-RpumvF5cOHyqaFYOcUwSipoVLrOrejOdTaRfFtie/exec?view=request">ABRIR PORTAL</a>
+    </div>
 
     <footer>
       Sistema de Gestión de Acceso y Parqueos<br>
       Facilities Management &amp; Security - RT
+      <div class="version">Versión 3.0.2 <span class="dot">•</span> 2026</div>
     </footer>
   </main>
 
   <script>
     const destination = "https://script.google.com/macros/s/AKfycbz-wXB7DVLMAG0bb2V-argyd1m-RpumvF5cOHyqaFYOcUwSipoVLrOrejOdTaRfFtie/exec?view=request";
+
     window.setTimeout(() => {
       window.location.replace(destination);
-    }, 900);
+    }, 1250);
+
+    window.setTimeout(() => {
+      document.getElementById("manualOpen").style.display = "block";
+    }, 3500);
   </script>
 </body>
 </html>
